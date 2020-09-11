@@ -11,6 +11,7 @@ type Client struct {
 	PersistentVolume PersistentVolumeOperations
 	StorageClass     StorageClassOperations
 	APIService       APIServiceOperations
+	NetworkPolicy    NetworkPolicyOperations
 }
 
 func NewClient(opts *clientbase.ClientOpts) (*Client, error) {
@@ -27,6 +28,7 @@ func NewClient(opts *clientbase.ClientOpts) (*Client, error) {
 	client.PersistentVolume = newPersistentVolumeClient(client)
 	client.StorageClass = newStorageClassClient(client)
 	client.APIService = newAPIServiceClient(client)
+	client.NetworkPolicy = newNetworkPolicyClient(client)
 
 	return client, nil
 }
