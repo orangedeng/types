@@ -98,6 +98,12 @@ func mgmtSecretTypes(schemas *types.Schemas) *types.Schemas {
 		schema.PluralName = "managementSecrets"
 		schema.CodeName = "ManagementSecret"
 		schema.CodeNamePlural = "ManagementSecrets"
+		schema.MustCustomizeField("name", func(field types.Field) types.Field {
+			field.Type = "hostname"
+			field.Nullable = false
+			field.Required = true
+			return field
+		})
 	})
 }
 
@@ -312,16 +318,6 @@ func authzTypes(schemas *types.Schemas) *types.Schemas {
 					Output: "project",
 				},
 				"exportYaml": {},
-				"enableMonitoring": {
-					Input: "monitoringInput",
-				},
-				"disableMonitoring": {},
-				"viewMonitoring": {
-					Output: "monitoringOutput",
-				},
-				"editMonitoring": {
-					Input: "monitoringInput",
-				},
 			}
 		}).
 		MustImport(&Version, v3.GlobalRole{}).
@@ -428,6 +424,7 @@ func authnTypes(schemas *types.Schemas) *types.Schemas {
 		AddMapperForType(&Version, v3.Group{}, m.DisplayName{}).
 		MustImport(&Version, v3.Group{}).
 		MustImport(&Version, v3.GroupMember{}).
+		MustImport(&Version, v3.SamlToken{}).
 		AddMapperForType(&Version, v3.Principal{}, m.DisplayName{}).
 		MustImportAndCustomize(&Version, v3.Principal{}, func(schema *types.Schema) {
 			schema.CollectionMethods = []string{http.MethodGet}
@@ -442,6 +439,10 @@ func authnTypes(schemas *types.Schemas) *types.Schemas {
 		MustImport(&Version, v3.SearchPrincipalsInput{}).
 		MustImport(&Version, v3.ChangePasswordInput{}).
 		MustImport(&Version, v3.SetPasswordInput{}).
+		MustImport(&Version, v3.SetHarborAuthInput{}).
+		MustImport(&Version, v3.UpdateHarborAuthInput{}).
+		MustImport(&Version, v3.SyncHarborUser{}).
+		MustImport(&Version, v3.HarborAdminAuthInput{}).
 		MustImportAndCustomize(&Version, v3.User{}, func(schema *types.Schema) {
 			schema.ResourceActions = map[string]types.Action{
 				"setpassword": {
@@ -449,12 +450,24 @@ func authnTypes(schemas *types.Schemas) *types.Schemas {
 					Output: "user",
 				},
 				"refreshauthprovideraccess": {},
+				"setharborauth": {
+					Input: "setHarborAuthInput",
+				},
+				"updateharborauth": {
+					Input: "updateHarborAuthInput",
+				},
 			}
 			schema.CollectionActions = map[string]types.Action{
 				"changepassword": {
 					Input: "changePasswordInput",
 				},
 				"refreshauthprovideraccess": {},
+				"syncharboruser": {
+					Input: "syncHarborUser",
+				},
+				"saveharborconfig": {
+					Input: "harborAdminAuthInput",
+				},
 			}
 		}).
 		MustImportAndCustomize(&Version, v3.AuthConfig{}, func(schema *types.Schema) {
@@ -589,7 +602,25 @@ func authnTypes(schemas *types.Schemas) *types.Schemas {
 			schema.ResourceMethods = []string{http.MethodGet, http.MethodPut}
 		}).
 		MustImport(&Version, v3.GoogleOauthConfigApplyInput{}).
-		MustImport(&Version, v3.GoogleOauthConfigTestOutput{})
+		MustImport(&Version, v3.GoogleOauthConfigTestOutput{}).
+		// Pandaria cas support
+		MustImportAndCustomize(&Version, v3.CASConfig{}, func(schema *types.Schema) {
+			schema.BaseType = "authConfig"
+			schema.ResourceActions = map[string]types.Action{
+				"disable": {},
+				"configureTest": {
+					Input:  "casConfig",
+					Output: "casConfigTestOutput",
+				},
+				"testAndApply": {
+					Input: "casTestAndApplyInput",
+				},
+			}
+			schema.CollectionMethods = []string{}
+			schema.ResourceMethods = []string{http.MethodGet, http.MethodPut}
+		}).
+		MustImport(&Version, v3.CASTestAndApplyInput{}).
+		MustImport(&Version, v3.CASConfigTestOutput{})
 }
 
 func configSchema(schema *types.Schema) {
@@ -685,6 +716,7 @@ func alertTypes(schema *types.Schemas) *types.Schemas {
 		MustImport(&Version, v3.ClusterAlert{}).
 		MustImport(&Version, v3.ProjectAlert{}).
 		MustImport(&Version, v3.Notification{}).
+		MustImport(&Version, v3.NotificationTemplate{}).
 		MustImportAndCustomize(&Version, v3.Notifier{}, func(schema *types.Schema) {
 			schema.CollectionActions = map[string]types.Action{
 				"send": {
