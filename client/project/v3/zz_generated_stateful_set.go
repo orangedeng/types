@@ -14,8 +14,10 @@ const (
 	StatefulSetFieldCreatorID                     = "creatorId"
 	StatefulSetFieldDNSConfig                     = "dnsConfig"
 	StatefulSetFieldDNSPolicy                     = "dnsPolicy"
+	StatefulSetFieldDescription                   = "description"
 	StatefulSetFieldEnableServiceLinks            = "enableServiceLinks"
 	StatefulSetFieldEphemeralContainers           = "ephemeralContainers"
+	StatefulSetFieldFSGroupChangePolicy           = "fsGroupChangePolicy"
 	StatefulSetFieldFsgid                         = "fsgid"
 	StatefulSetFieldGids                          = "gids"
 	StatefulSetFieldHostAliases                   = "hostAliases"
@@ -72,8 +74,10 @@ type StatefulSet struct {
 	CreatorID                     string                         `json:"creatorId,omitempty" yaml:"creatorId,omitempty"`
 	DNSConfig                     *PodDNSConfig                  `json:"dnsConfig,omitempty" yaml:"dnsConfig,omitempty"`
 	DNSPolicy                     string                         `json:"dnsPolicy,omitempty" yaml:"dnsPolicy,omitempty"`
+	Description                   string                         `json:"description,omitempty" yaml:"description,omitempty"`
 	EnableServiceLinks            *bool                          `json:"enableServiceLinks,omitempty" yaml:"enableServiceLinks,omitempty"`
 	EphemeralContainers           []EphemeralContainer           `json:"ephemeralContainers,omitempty" yaml:"ephemeralContainers,omitempty"`
+	FSGroupChangePolicy           string                         `json:"fsGroupChangePolicy,omitempty" yaml:"fsGroupChangePolicy,omitempty"`
 	Fsgid                         *int64                         `json:"fsgid,omitempty" yaml:"fsgid,omitempty"`
 	Gids                          []int64                        `json:"gids,omitempty" yaml:"gids,omitempty"`
 	HostAliases                   []HostAlias                    `json:"hostAliases,omitempty" yaml:"hostAliases,omitempty"`

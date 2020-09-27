@@ -29,6 +29,7 @@ type Client struct {
 	TemplateContent                         TemplateContentOperations
 	Group                                   GroupOperations
 	GroupMember                             GroupMemberOperations
+	SamlToken                               SamlTokenOperations
 	Principal                               PrincipalOperations
 	User                                    UserOperations
 	AuthConfig                              AuthConfigOperations
@@ -43,6 +44,7 @@ type Client struct {
 	Feature                                 FeatureOperations
 	ClusterAlert                            ClusterAlertOperations
 	ProjectAlert                            ProjectAlertOperations
+	NotificationTemplate                    NotificationTemplateOperations
 	Notifier                                NotifierOperations
 	ClusterAlertGroup                       ClusterAlertGroupOperations
 	ProjectAlertGroup                       ProjectAlertGroupOperations
@@ -104,6 +106,7 @@ func NewClient(opts *clientbase.ClientOpts) (*Client, error) {
 	client.TemplateContent = newTemplateContentClient(client)
 	client.Group = newGroupClient(client)
 	client.GroupMember = newGroupMemberClient(client)
+	client.SamlToken = newSamlTokenClient(client)
 	client.Principal = newPrincipalClient(client)
 	client.User = newUserClient(client)
 	client.AuthConfig = newAuthConfigClient(client)
@@ -118,6 +121,7 @@ func NewClient(opts *clientbase.ClientOpts) (*Client, error) {
 	client.Feature = newFeatureClient(client)
 	client.ClusterAlert = newClusterAlertClient(client)
 	client.ProjectAlert = newProjectAlertClient(client)
+	client.NotificationTemplate = newNotificationTemplateClient(client)
 	client.Notifier = newNotifierClient(client)
 	client.ClusterAlertGroup = newClusterAlertGroupClient(client)
 	client.ProjectAlertGroup = newProjectAlertGroupClient(client)

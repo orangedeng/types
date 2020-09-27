@@ -42,6 +42,7 @@ type Interface interface {
 	TemplateContentsGetter
 	GroupsGetter
 	GroupMembersGetter
+	SamlTokensGetter
 	PrincipalsGetter
 	UsersGetter
 	AuthConfigsGetter
@@ -57,6 +58,7 @@ type Interface interface {
 	FeaturesGetter
 	ClusterAlertsGetter
 	ProjectAlertsGetter
+	NotificationTemplatesGetter
 	NotifiersGetter
 	ClusterAlertGroupsGetter
 	ProjectAlertGroupsGetter
@@ -112,6 +114,7 @@ type Client struct {
 	templateContentControllers                         map[string]TemplateContentController
 	groupControllers                                   map[string]GroupController
 	groupMemberControllers                             map[string]GroupMemberController
+	samlTokenControllers                               map[string]SamlTokenController
 	principalControllers                               map[string]PrincipalController
 	userControllers                                    map[string]UserController
 	authConfigControllers                              map[string]AuthConfigController
@@ -127,6 +130,7 @@ type Client struct {
 	featureControllers                                 map[string]FeatureController
 	clusterAlertControllers                            map[string]ClusterAlertController
 	projectAlertControllers                            map[string]ProjectAlertController
+	notificationTemplateControllers                    map[string]NotificationTemplateController
 	notifierControllers                                map[string]NotifierController
 	clusterAlertGroupControllers                       map[string]ClusterAlertGroupController
 	projectAlertGroupControllers                       map[string]ProjectAlertGroupController
@@ -190,6 +194,7 @@ func NewForConfig(config rest.Config) (Interface, error) {
 		templateContentControllers:                         map[string]TemplateContentController{},
 		groupControllers:                                   map[string]GroupController{},
 		groupMemberControllers:                             map[string]GroupMemberController{},
+		samlTokenControllers:                               map[string]SamlTokenController{},
 		principalControllers:                               map[string]PrincipalController{},
 		userControllers:                                    map[string]UserController{},
 		authConfigControllers:                              map[string]AuthConfigController{},
@@ -205,6 +210,7 @@ func NewForConfig(config rest.Config) (Interface, error) {
 		featureControllers:                                 map[string]FeatureController{},
 		clusterAlertControllers:                            map[string]ClusterAlertController{},
 		projectAlertControllers:                            map[string]ProjectAlertController{},
+		notificationTemplateControllers:                    map[string]NotificationTemplateController{},
 		notifierControllers:                                map[string]NotifierController{},
 		clusterAlertGroupControllers:                       map[string]ClusterAlertGroupController{},
 		projectAlertGroupControllers:                       map[string]ProjectAlertGroupController{},
@@ -532,6 +538,19 @@ func (c *Client) GroupMembers(namespace string) GroupMemberInterface {
 	}
 }
 
+type SamlTokensGetter interface {
+	SamlTokens(namespace string) SamlTokenInterface
+}
+
+func (c *Client) SamlTokens(namespace string) SamlTokenInterface {
+	objectClient := objectclient.NewObjectClient(namespace, c.restClient, &SamlTokenResource, SamlTokenGroupVersionKind, samlTokenFactory{})
+	return &samlTokenClient{
+		ns:           namespace,
+		client:       c,
+		objectClient: objectClient,
+	}
+}
+
 type PrincipalsGetter interface {
 	Principals(namespace string) PrincipalInterface
 }
@@ -721,6 +740,19 @@ type ProjectAlertsGetter interface {
 func (c *Client) ProjectAlerts(namespace string) ProjectAlertInterface {
 	objectClient := objectclient.NewObjectClient(namespace, c.restClient, &ProjectAlertResource, ProjectAlertGroupVersionKind, projectAlertFactory{})
 	return &projectAlertClient{
+		ns:           namespace,
+		client:       c,
+		objectClient: objectClient,
+	}
+}
+
+type NotificationTemplatesGetter interface {
+	NotificationTemplates(namespace string) NotificationTemplateInterface
+}
+
+func (c *Client) NotificationTemplates(namespace string) NotificationTemplateInterface {
+	objectClient := objectclient.NewObjectClient(namespace, c.restClient, &NotificationTemplateResource, NotificationTemplateGroupVersionKind, notificationTemplateFactory{})
+	return &notificationTemplateClient{
 		ns:           namespace,
 		client:       c,
 		objectClient: objectClient,

@@ -32,6 +32,7 @@ type Config struct {
 	TemplateContents                         map[string]managementClient.TemplateContent                         `json:"templateContents,omitempty" yaml:"templateContents,omitempty"`
 	Groups                                   map[string]managementClient.Group                                   `json:"groups,omitempty" yaml:"groups,omitempty"`
 	GroupMembers                             map[string]managementClient.GroupMember                             `json:"groupMembers,omitempty" yaml:"groupMembers,omitempty"`
+	SamlTokens                               map[string]managementClient.SamlToken                               `json:"samlTokens,omitempty" yaml:"samlTokens,omitempty"`
 	Users                                    map[string]managementClient.User                                    `json:"users,omitempty" yaml:"users,omitempty"`
 	LdapConfigs                              map[string]managementClient.LdapConfig                              `json:"ldapConfigs,omitempty" yaml:"ldapConfigs,omitempty"`
 	Tokens                                   map[string]managementClient.Token                                   `json:"tokens,omitempty" yaml:"tokens,omitempty"`
@@ -43,6 +44,7 @@ type Config struct {
 	Features                                 map[string]managementClient.Feature                                 `json:"features,omitempty" yaml:"features,omitempty"`
 	ClusterAlerts                            map[string]managementClient.ClusterAlert                            `json:"clusterAlerts,omitempty" yaml:"clusterAlerts,omitempty"`
 	ProjectAlerts                            map[string]managementClient.ProjectAlert                            `json:"projectAlerts,omitempty" yaml:"projectAlerts,omitempty"`
+	NotificationTemplates                    map[string]managementClient.NotificationTemplate                    `json:"notificationTemplates,omitempty" yaml:"notificationTemplates,omitempty"`
 	Notifiers                                map[string]managementClient.Notifier                                `json:"notifiers,omitempty" yaml:"notifiers,omitempty"`
 	ClusterAlertGroups                       map[string]managementClient.ClusterAlertGroup                       `json:"clusterAlertGroups,omitempty" yaml:"clusterAlertGroups,omitempty"`
 	ProjectAlertGroups                       map[string]managementClient.ProjectAlertGroup                       `json:"projectAlertGroups,omitempty" yaml:"projectAlertGroups,omitempty"`
@@ -120,4 +122,5 @@ type Config struct {
 	VirtualServices                map[string]projectClient.VirtualService                `json:"virtualServices,omitempty" yaml:"virtualServices,omitempty"`
 	DestinationRules               map[string]projectClient.DestinationRule               `json:"destinationRules,omitempty" yaml:"destinationRules,omitempty"`
 	Gateways                       map[string]projectClient.Gateway                       `json:"gateways,omitempty" yaml:"gateways,omitempty"`
+	CloneApps                      map[string]projectClient.CloneApp                      `json:"cloneApps,omitempty" yaml:"cloneApps,omitempty"`
 }
