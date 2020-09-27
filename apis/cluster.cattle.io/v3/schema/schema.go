@@ -8,7 +8,9 @@ import (
 	m "github.com/rancher/norman/types/mapper"
 	v3 "github.com/rancher/types/apis/cluster.cattle.io/v3"
 	"github.com/rancher/types/factory"
+	"github.com/rancher/types/mapper"
 	v1 "k8s.io/api/core/v1"
+	knetworkingv1 "k8s.io/api/networking/v1"
 	storagev1 "k8s.io/api/storage/v1"
 	apiregistrationv1 "k8s.io/kube-aggregator/pkg/apis/apiregistration/v1"
 )
@@ -27,7 +29,8 @@ var (
 		Init(persistentVolumeTypes).
 		Init(storageClassTypes).
 		Init(tokens).
-		Init(apiServiceTypes)
+		Init(apiServiceTypes).
+		Init(networkPolicyTypes)
 )
 
 func namespaceTypes(schemas *types.Schemas) *types.Schemas {
@@ -145,4 +148,38 @@ func apiServiceTypes(Schemas *types.Schemas) *types.Schemas {
 			&m.Embed{Field: "status"},
 		).
 		MustImport(&Version, apiregistrationv1.APIService{})
+}
+
+func networkPolicyTypes(Schemas *types.Schemas) *types.Schemas {
+	return Schemas.
+		AddMapperForType(&Version, knetworkingv1.NetworkPolicyPort{},
+			m.Enum{Field: "protocol", Options: []string{"TCP", "UDP"}},
+		).
+		AddMapperForType(&Version, knetworkingv1.NetworkPolicyPeer{},
+			mapper.IDSelector{ID: "targetWorkloadId", Selector: "podSelector", Key: "workload.user.cattle.io/workloadselector"},
+			mapper.IDSelector{ID: "projectId", Selector: "namespaceSelector", Key: "field.cattle.io/projectId", TrimPrefix: true},
+		).
+		MustImport(&Version, knetworkingv1.NetworkPolicyPeer{}, struct {
+			TargetWorkloadId string `json:"targetWorkloadId,omitempty"`
+			ProjectID        string `json:"projectId,omitempty" norman:"type=reference[/v3/schemas/project]"`
+		}{}).
+		AddMapperForType(&Version, knetworkingv1.NetworkPolicy{},
+			&m.AnnotationField{Field: "displayName"},
+			&m.DisplayName{},
+			&m.AnnotationField{Field: "targetWorkloadId"},
+			mapper.AnnotationData{Field: "ingressExtra", List: true},
+			mapper.AnnotationData{Field: "egressExtra", List: true},
+			mapper.IDSelector{ID: "targetWorkloadId", Selector: "podSelector", Key: "workload.user.cattle.io/workloadselector"},
+			mapper.ExtractListField{List: "ingress", Fields: []string{"ingressIds"}, ToList: "ingressExtra"},
+			mapper.ExtractListField{List: "egress", Fields: []string{"egressIds"}, ToList: "egressExtra"},
+			mapper.Range{List: "ingress", Mapper: mapper.ExtractListField{List: "from", Fields: []string{"targetWorkloadId", "projectId"}, ToList: "ingressIds"}},
+			mapper.Range{List: "egress", Mapper: mapper.ExtractListField{List: "to", Fields: []string{"targetWorkloadId", "projectId"}, ToList: "egressIds"}},
+			&mapper.ListToEnum{Field: "policyTypes", Options: []string{"Ingress", "Egress"}},
+			&m.Required{Fields: []string{"policyTypes"}},
+		).
+		MustImport(&Version, knetworkingv1.NetworkPolicy{}, struct {
+			types.Namespaced
+			TargetWorkloadId string `json:"targetWorkloadId,omitempty"`
+			DisplayName      string `json:"displayName,omitempty"`
+		}{})
 }
