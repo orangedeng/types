@@ -9,7 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-const prefix = "store.cattle.io/"
+const prefix = "store.field/"
 
 type AnnotationData struct {
 	Field string
